@@ -476,42 +476,44 @@ export const SubmitButton = () => {
                         <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>💾</div>
                         <h3 style={{ margin: '0 0 12px 0', color: 'var(--text-main)', fontSize: '1.2rem' }}>Unsaved Changes</h3>
                         <p style={{ color: 'var(--text-dim)', marginBottom: '24px', fontSize: '0.95rem' }}>
-                            You have unsaved changes. Do you want to save them before starting a new pipeline?
+                            {isGlobalDemo ? "You have unsaved changes. Since saving is disabled in demo mode, they will be lost." : "You have unsaved changes. Do you want to save them before starting a new pipeline?"}
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <button onClick={async () => {
-                                const isGlobal = (() => { try { const c = localStorage.getItem('demo_config_cache'); return c ? JSON.parse(c).data.is_demo : false; } catch(e) { return false; } })();
-                                if (useStore.getState().currentUser?.id === 'demo' || isGlobal) {
-                                    setNewModalOpen(false);
-                                    setDemoUpgradeModalOpen(true);
-                                    return;
-                                }
-                                if (!token) { showToast('error', "You must be logged in to save."); return; }
-                                
-                                const handleSuccess = () => {
-                                    clearPipeline();
-                                    showToast('success', "Started new pipeline.");
-                                };
-
-                                if (!currentPipelineId) {
-                                    setNewModalOpen(false);
-                                    setPromptModal({ isOpen: true, isNew: true, name: 'My Pipeline', onSuccess: handleSuccess });
-                                } else {
-                                    try {
+                            {!isGlobalDemo && (
+                                <button onClick={async () => {
+                                    const isGlobal = (() => { try { const c = localStorage.getItem('demo_config_cache'); return c ? JSON.parse(c).data.is_demo : false; } catch(e) { return false; } })();
+                                    if (useStore.getState().currentUser?.id === 'demo' || isGlobal) {
                                         setNewModalOpen(false);
-                                        await savePipelineToServer(currentPipelineName, false);
-                                        handleSuccess();
-                                    } catch (e) {
-                                        showToast('error', "Failed to save pipeline.");
+                                        setDemoUpgradeModalOpen(true);
+                                        return;
                                     }
-                                }
-                            }} style={{
-                                background: '#10b981', color: 'white', border: 'none', padding: '10px',
-                                borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#059669'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = '#10b981'}
-                            >Save Pipeline</button>
+                                    if (!token) { showToast('error', "You must be logged in to save."); return; }
+                                    
+                                    const handleSuccess = () => {
+                                        clearPipeline();
+                                        showToast('success', "Started new pipeline.");
+                                    };
+
+                                    if (!currentPipelineId) {
+                                        setNewModalOpen(false);
+                                        setPromptModal({ isOpen: true, isNew: true, name: 'My Pipeline', onSuccess: handleSuccess });
+                                    } else {
+                                        try {
+                                            setNewModalOpen(false);
+                                            await savePipelineToServer(currentPipelineName, false);
+                                            handleSuccess();
+                                        } catch (e) {
+                                            showToast('error', "Failed to save pipeline.");
+                                        }
+                                    }
+                                }} style={{
+                                    background: '#10b981', color: 'white', border: 'none', padding: '10px',
+                                    borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#059669'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = '#10b981'}
+                                >Save Pipeline</button>
+                            )}
                             
                             <button onClick={() => {
                                 setNewModalOpen(false);
