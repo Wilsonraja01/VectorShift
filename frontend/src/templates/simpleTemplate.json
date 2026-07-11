@@ -1,0 +1,44 @@
+{
+  "nodes": [
+    {
+      "id": "customInput-1",
+      "type": "customInput",
+      "position": { "x": 200, "y": 250 },
+      "data": { "inputName": "User Prompt", "inputType": "Text" }
+    },
+    {
+      "id": "llm-1",
+      "type": "llm",
+      "position": { "x": 600, "y": 250 },
+      "data": {}
+    },
+    {
+      "id": "customOutput-1",
+      "type": "customOutput",
+      "position": { "x": 1000, "y": 250 },
+      "data": { "outputName": "Final Response" }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-customInput-1-llm-1",
+      "source": "customInput-1",
+      "target": "llm-1",
+      "sourceHandle": "customInput-1-value",
+      "targetHandle": "llm-1-system",
+      "type": "smoothstep",
+      "animated": true,
+      "markerEnd": { "type": "arrowclosed", "height": 20, "width": 20 }
+    },
+    {
+      "id": "e-llm-1-customOutput-1",
+      "source": "llm-1",
+      "target": "customOutput-1",
+      "sourceHandle": "llm-1-response",
+      "targetHandle": "customOutput-1-value",
+      "type": "smoothstep",
+      "animated": true,
+      "markerEnd": { "type": "arrowclosed", "height": 20, "width": 20 }
+    }
+  ]
+}

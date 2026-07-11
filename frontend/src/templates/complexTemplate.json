@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "id": "customInput-1",
+      "type": "customInput",
+      "position": { "x": 100, "y": 150 },
+      "data": { "inputName": "Search Query", "inputType": "Text" }
+    },
+    {
+      "id": "database-1",
+      "type": "database",
+      "position": { "x": 100, "y": 350 },
+      "data": {}
+    },
+    {
+      "id": "transform-1",
+      "type": "transform",
+      "position": { "x": 450, "y": 250 },
+      "data": {}
+    },
+    {
+      "id": "api-1",
+      "type": "api",
+      "position": { "x": 800, "y": 100 },
+      "data": {}
+    },
+    {
+      "id": "llm-1",
+      "type": "llm",
+      "position": { "x": 800, "y": 400 },
+      "data": {}
+    },
+    {
+      "id": "condition-1",
+      "type": "condition",
+      "position": { "x": 1150, "y": 250 },
+      "data": {}
+    },
+    {
+      "id": "slack-1",
+      "type": "slack",
+      "position": { "x": 1500, "y": 100 },
+      "data": {}
+    },
+    {
+      "id": "customOutput-1",
+      "type": "customOutput",
+      "position": { "x": 1500, "y": 400 },
+      "data": { "outputName": "Final Result" }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "customInput-1",
+      "target": "transform-1",
+      "sourceHandle": "customInput-1-value",
+      "targetHandle": "transform-1-input",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e2",
+      "source": "database-1",
+      "target": "transform-1",
+      "sourceHandle": "database-1-rows",
+      "targetHandle": "transform-1-input",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e3",
+      "source": "transform-1",
+      "target": "api-1",
+      "sourceHandle": "transform-1-output",
+      "targetHandle": "api-1-payload",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e4",
+      "source": "transform-1",
+      "target": "llm-1",
+      "sourceHandle": "transform-1-output",
+      "targetHandle": "llm-1-system",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e5",
+      "source": "api-1",
+      "target": "condition-1",
+      "sourceHandle": "api-1-response",
+      "targetHandle": "condition-1-input",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e6",
+      "source": "llm-1",
+      "target": "condition-1",
+      "sourceHandle": "llm-1-response",
+      "targetHandle": "condition-1-input",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e7",
+      "source": "condition-1",
+      "target": "slack-1",
+      "sourceHandle": "condition-1-true",
+      "targetHandle": "slack-1-message",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e8",
+      "source": "condition-1",
+      "target": "customOutput-1",
+      "sourceHandle": "condition-1-false",
+      "targetHandle": "customOutput-1-value",
+      "type": "smoothstep",
+      "animated": true
+    }
+  ]
+}
