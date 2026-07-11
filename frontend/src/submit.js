@@ -552,21 +552,23 @@ export const SubmitButton = () => {
                         <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>🚀</div>
                         <h3 style={{ margin: '0 0 12px 0', color: 'var(--text-main)', fontSize: '1.2rem' }}>Create an Account</h3>
                         <p style={{ color: 'var(--text-dim)', marginBottom: '24px', fontSize: '0.95rem' }}>
-                            You are currently exploring the demo version. Create an account to save your pipelines and unlock all features!
+                            {isGlobalDemo ? "Saving pipelines is disabled in demo mode." : "You are currently exploring the demo version. Create an account to save your pipelines and unlock all features!"}
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <button onClick={() => {
-                                setDemoUpgradeModalOpen(false);
-                                setShowSignupModal({ isOpen: true, mode: 'signup' });
-                            }} style={{
-                                background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none', padding: '10px',
-                                borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'
-                            }}>Login / Sign Up</button>
+                            {!isGlobalDemo && (
+                                <button onClick={() => {
+                                    setDemoUpgradeModalOpen(false);
+                                    setShowSignupModal({ isOpen: true, mode: 'signup' });
+                                }} style={{
+                                    background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none', padding: '10px',
+                                    borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'
+                                }}>Login / Sign Up</button>
+                            )}
                             
                             <button onClick={() => setDemoUpgradeModalOpen(false)} style={{
                                 background: 'transparent', color: 'var(--text-dim)', border: '1px solid var(--border-color)',
                                 padding: '10px', borderRadius: '8px', cursor: 'pointer'
-                            }}>Continue in Demo</button>
+                            }}>{isGlobalDemo ? 'Close' : 'Continue in Demo'}</button>
                         </div>
                     </div>
                 </div>,

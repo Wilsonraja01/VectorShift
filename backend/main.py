@@ -195,6 +195,9 @@ def get_config():
 
 @app.post('/auth')
 def auth_user(request: AuthRequest, background_tasks: BackgroundTasks, db: sqlite3.Connection = Depends(get_db_session)):
+    if os.environ.get("IS_DEMO", "false").lower() == "true":
+        raise HTTPException(status_code=403, detail="Login and signup are disabled in demo mode")
+        
     username = request.username
     incoming_hash = request.password_hash
     
