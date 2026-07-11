@@ -39,7 +39,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         raise HTTPException(status_code=401, detail="Invalid token")
 
 def send_reset_email(email: str, token: str):
-    reset_link = f"http://localhost:3000/?reset_token={token}"
+    reset_link = f"https://vector-shift-sage.vercel.app/?reset_token={token}"
     html_content = f"""
     <h2>Password Reset Request</h2>
     <p>You requested a password reset for your Vector Shift account.</p>
@@ -74,7 +74,7 @@ def send_reset_email(email: str, token: str):
         print("="*50 + "\n")
 
 def send_verification_email(email: str, token: str):
-    verify_link = f"http://localhost:3000/?verify_token={token}"
+    verify_link = f"https://vector-shift-sage.vercel.app/?verify_token={token}"
     html_content = f"""
     <h2>Welcome to Vector Shift!</h2>
     <p>Please verify your email address to activate your account.</p>
