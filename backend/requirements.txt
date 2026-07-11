@@ -5,3 +5,4 @@ bcrypt
 pyjwt
 resend
 python-dotenv
+python-multipart
