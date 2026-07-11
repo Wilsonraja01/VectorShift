@@ -350,7 +350,7 @@ export const SubmitButton = () => {
                 </button>
             </div>
 
-            {modalData && (
+            {modalData && createPortal(
                 <div className="modal-overlay" onClick={() => setModalData(null)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <h2>Analysis Complete</h2>
@@ -376,7 +376,8 @@ export const SubmitButton = () => {
                         
                         <button className="modal-close-btn" onClick={() => setModalData(null)}>Awesome!</button>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {clearModalOpen && createPortal(
