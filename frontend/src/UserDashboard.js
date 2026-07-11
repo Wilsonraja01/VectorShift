@@ -21,6 +21,7 @@ export const UserDashboard = () => {
     const [deleteConfirmModal, setDeleteConfirmModal] = useState({ isOpen: false, id: null });
     const [unsavedModal, setUnsavedModal] = useState({ isOpen: false, pendingAction: null });
     const [previewModal, setPreviewModal] = useState({ isOpen: false, pipeline: null });
+    const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen && currentUser && currentUser.id !== 'demo' && token) {
@@ -54,6 +55,26 @@ export const UserDashboard = () => {
     const executeLogout = () => {
         logout();
         setIsOpen(false);
+    };
+
+    const executeDeleteAccount = async () => {
+        try {
+            const res = await fetch(`https://vector-shift-backend.fly.dev/users/me`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                logout();
+                setIsOpen(false);
+                setDeleteAccountModalOpen(false);
+            } else {
+                const data = await res.json();
+                alert(data.detail || "Failed to delete account");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Failed to delete account");
+        }
     };
 
     const handleLogoutClick = () => {
@@ -244,7 +265,7 @@ export const UserDashboard = () => {
                                                 No saved pipelines yet. Click "Save" to add one!
                                             </div>
                                         ) : (
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto', paddingRight: '8px' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto', paddingRight: '0px' }}>
                                                 {savedPipelines.map(p => (
                                                     <div 
                                                         key={p.id}
@@ -347,7 +368,8 @@ export const UserDashboard = () => {
                             background: 'rgba(0,0,0,0.2)',
                             display: 'flex',
                             justifyContent: 'space-between',
-                            alignItems: 'center'
+                            alignItems: 'center',
+                            gap: '5px'
                         }}>
                             <a 
                                 href="https://wilsonraja01.github.io/personal-portfolio/" 
@@ -380,57 +402,123 @@ export const UserDashboard = () => {
                             >
                                 <span>✨</span> By Wilson
                             </a>
-                            <button 
-                            disabled={currentUser?.id === 'demo' && (() => {
-                                try {
-                                    const cached = localStorage.getItem('demo_config_cache');
-                                    if (cached) return JSON.parse(cached).data.is_demo;
-                                } catch(e) {}
-                                return false;
-                            })()}
-                            onClick={() => { 
-                                setIsOpen(false); 
-                                if (currentUser?.id === 'demo') {
-                                    window.dispatchEvent(new CustomEvent('open-login-modal'));
-                                } else {
-                                    logout(); 
-                                }
-                            }} style={{
-                                background: currentUser?.id === 'demo' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                                color: currentUser?.id === 'demo' ? '#3b82f6' : '#ef4444',
-                                border: currentUser?.id === 'demo' ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)',
-                                padding: '8px 24px',
-                                borderRadius: '6px',
-                                fontWeight: 600,
-                                cursor: (currentUser?.id === 'demo' && (() => {
+                            <div style={{ display: 'flex', gap: '5px' }}>
+                                {currentUser?.id !== 'demo' && (
+                                    <button 
+                                        onClick={() => {
+                                            const isGlobal = (() => { try { const c = localStorage.getItem('demo_config_cache'); return c ? JSON.parse(c).data.is_demo : false; } catch(e) { return false; } })();
+                                            if (isGlobal) {
+                                                alert("Account deletion is disabled in demo mode.");
+                                                return;
+                                            }
+                                            setDeleteAccountModalOpen(true);
+                                        }} 
+                                        style={{
+                                            background: 'transparent',
+                                            color: '#ef4444',
+                                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                                            padding: '8px 16px',
+                                            borderRadius: '6px',
+                                            fontWeight: 600,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        Delete Account
+                                    </button>
+                                )}
+                                <button 
+                                disabled={currentUser?.id === 'demo' && (() => {
                                     try {
                                         const cached = localStorage.getItem('demo_config_cache');
                                         if (cached) return JSON.parse(cached).data.is_demo;
                                     } catch(e) {}
                                     return false;
-                                })()) ? 'not-allowed' : 'pointer',
-                                opacity: (currentUser?.id === 'demo' && (() => {
-                                    try {
-                                        const cached = localStorage.getItem('demo_config_cache');
-                                        if (cached) return JSON.parse(cached).data.is_demo;
-                                    } catch(e) {}
-                                    return false;
-                                })()) ? 0.5 : 1,
-                                transition: 'all 0.2s ease'
+                                })()}
+                                onClick={() => { 
+                                    setIsOpen(false); 
+                                    if (currentUser?.id === 'demo') {
+                                        window.dispatchEvent(new CustomEvent('open-login-modal'));
+                                    } else {
+                                        logout(); 
+                                    }
+                                }} style={{
+                                    background: currentUser?.id === 'demo' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                    color: currentUser?.id === 'demo' ? '#3b82f6' : '#ef4444',
+                                    border: currentUser?.id === 'demo' ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)',
+                                    padding: '8px 24px',
+                                    borderRadius: '6px',
+                                    fontWeight: 600,
+                                    cursor: (currentUser?.id === 'demo' && (() => {
+                                        try {
+                                            const cached = localStorage.getItem('demo_config_cache');
+                                            if (cached) return JSON.parse(cached).data.is_demo;
+                                        } catch(e) {}
+                                        return false;
+                                    })()) ? 'not-allowed' : 'pointer',
+                                    opacity: (currentUser?.id === 'demo' && (() => {
+                                        try {
+                                            const cached = localStorage.getItem('demo_config_cache');
+                                            if (cached) return JSON.parse(cached).data.is_demo;
+                                        } catch(e) {}
+                                        return false;
+                                    })()) ? 0.5 : 1,
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => { 
+                                    const isGlobal = (() => { try { const c = localStorage.getItem('demo_config_cache'); return c ? JSON.parse(c).data.is_demo : false; } catch(e) { return false; } })();
+                                    if (currentUser?.id === 'demo' && isGlobal) return;
+                                    e.currentTarget.style.background = currentUser?.id === 'demo' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'; 
+                                }}
+                                onMouseLeave={(e) => { 
+                                    const isGlobal = (() => { try { const c = localStorage.getItem('demo_config_cache'); return c ? JSON.parse(c).data.is_demo : false; } catch(e) { return false; } })();
+                                    if (currentUser?.id === 'demo' && isGlobal) return;
+                                    e.currentTarget.style.background = currentUser?.id === 'demo' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)'; 
+                                }}
+                                >
+                                    {currentUser?.id === 'demo' ? 'Sign Up / Log In' : 'Log Out'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {deleteAccountModalOpen && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+                    zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'auto'
+                }} onClick={() => setDeleteAccountModalOpen(false)}>
+                    <div style={{
+                        background: 'var(--bg-card)', padding: '24px', borderRadius: '12px',
+                        border: '1px solid var(--border-color)', width: '360px',
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.5)', textAlign: 'center'
+                    }} onClick={(e) => e.stopPropagation()}>
+                        <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>⚠️</div>
+                        <h3 style={{ margin: '0 0 12px 0', color: 'var(--text-main)', fontSize: '1.2rem' }}>Delete Account?</h3>
+                        <p style={{ color: 'var(--text-dim)', marginBottom: '24px', fontSize: '0.95rem' }}>
+                            Are you sure you want to completely delete your account? All of your saved pipelines, custom nodes, and data will be permanently erased. This action cannot be undone.
+                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
+                            <button onClick={() => setDeleteAccountModalOpen(false)} style={{
+                                background: 'transparent', color: 'var(--text-dim)', border: '1px solid var(--border-color)',
+                                padding: '10px 16px', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s',
+                                fontWeight: 600, flex: 1
                             }}
-                            onMouseEnter={(e) => { 
-                                const isGlobal = (() => { try { const c = localStorage.getItem('demo_config_cache'); return c ? JSON.parse(c).data.is_demo : false; } catch(e) { return false; } })();
-                                if (currentUser?.id === 'demo' && isGlobal) return;
-                                e.currentTarget.style.background = currentUser?.id === 'demo' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'; 
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                            >Cancel</button>
+                            <button onClick={executeDeleteAccount} style={{
+                                background: 'linear-gradient(135deg, #ef4444, #b91c1c)', color: 'white', border: 'none',
+                                padding: '10px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold',
+                                boxShadow: '0 4px 10px rgba(239, 68, 68, 0.3)', transition: 'all 0.2s', flex: 1
                             }}
-                            onMouseLeave={(e) => { 
-                                const isGlobal = (() => { try { const c = localStorage.getItem('demo_config_cache'); return c ? JSON.parse(c).data.is_demo : false; } catch(e) { return false; } })();
-                                if (currentUser?.id === 'demo' && isGlobal) return;
-                                e.currentTarget.style.background = currentUser?.id === 'demo' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)'; 
-                            }}
-                            >
-                                {currentUser?.id === 'demo' ? 'Sign Up / Log In' : 'Log Out'}
-                            </button>
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                            >Delete Permanently</button>
                         </div>
                     </div>
                 </div>

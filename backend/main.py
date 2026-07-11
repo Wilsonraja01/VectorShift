@@ -478,3 +478,19 @@ def parse_pipeline(pipeline: str = Form(...)):
         return {'num_nodes': num_nodes, 'num_edges': num_edges, 'is_dag': is_dag}
     except Exception as e:
         return {'error': str(e)}
+
+@app.delete('/users/me')
+def delete_user(user_id: str = Depends(get_current_user), db: sqlite3.Connection = Depends(get_db_session)):
+    cursor = db.cursor()
+    
+    if os.environ.get("IS_DEMO", "false").lower() == "true":
+        raise HTTPException(status_code=403, detail="Account deletion is disabled in demo mode")
+        
+    cursor.execute("DELETE FROM pipelines WHERE user_id = ?", (user_id,))
+    cursor.execute("DELETE FROM custom_nodes WHERE user_id = ?", (user_id,))
+    cursor.execute("DELETE FROM password_resets WHERE user_id = ?", (user_id,))
+    cursor.execute("DELETE FROM verification_tokens WHERE user_id = ?", (user_id,))
+    cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    
+    return {"status": "success", "message": "Account deleted successfully"}
+
